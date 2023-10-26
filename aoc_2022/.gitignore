@@ -175,5 +175,5 @@ dist
 .DS_Store
 
 # rust stuff
-\*target
-\*debug
+*target
+*debug
