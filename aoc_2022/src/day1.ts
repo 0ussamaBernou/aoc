@@ -1,5 +1,4 @@
 import { BunFile } from "bun";
-import path from "path";
 
 // read file
 const path: string = "day1.input";

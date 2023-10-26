@@ -1,0 +1,96 @@
+// A for Rock, B for Paper, and C for Scissors.
+//(1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round
+//(0 if you lost, 3 if the round was a draw, and 6 if you won)
+const INPUT: &str = "A Y
+B X
+C Z";
+
+use anyhow::Result;
+use std::str::FromStr;
+
+#[derive(Debug)]
+enum Opponent {
+    A = 1,
+    B = 2,
+    C = 3,
+}
+
+#[derive(Debug)]
+enum Me {
+    X = 1,
+    Y = 2,
+    Z = 3,
+}
+
+#[derive(Debug)]
+enum Round {
+    Win(i32),
+    Draw(i32),
+    Lost(i32),
+}
+
+impl FromStr for Round {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self> {
+        if let Some((opponent, me)) = s.split_once(" ") {
+            let op = match opponent {
+                "A" => Opponent::A as i32,
+                "B" => Opponent::B as i32,
+                "C" => Opponent::C as i32,
+                _ => panic!("unhandled move"),
+            };
+            let mine = match me {
+                "X" => Me::X as i32,
+                "Y" => Me::Y as i32,
+                "Z" => Me::Z as i32,
+                _ => panic!("unhandled move"),
+            };
+            let diff = mine - op;
+            Ok(match diff {
+                d if d > 0 => Round::Win(mine + 6),
+                d if d < 0 => Round::Lost(mine),
+                d if d == 0 => Round::Draw(mine + 3),
+                _ => panic!("Unhandled diff"),
+            })
+        } else {
+            Err(anyhow::format_err!("Could not split players"))
+        }
+    }
+}
+
+fn main() {
+    // unimplemented!();
+    let filename = "day2.input";
+    println!(
+        "result: {:?}",
+        aoc::read_one_per_line::<Round>(filename)
+            .unwrap()
+            .iter()
+            .map(|round| match round {
+                Round::Win(res) => res,
+                Round::Lost(res) => res,
+                Round::Draw(res) => res,
+            })
+            .sum::<i32>()
+    );
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_input() {
+        assert_eq!(
+            INPUT
+                .lines()
+                .map(|line| Round::from_str(line).unwrap())
+                .map(|round| match round {
+                    Round::Win(res) => res,
+                    Round::Lost(res) => res,
+                    Round::Draw(res) => res,
+                })
+                .sum::<i32>(),
+            15
+        )
+    }
+}
